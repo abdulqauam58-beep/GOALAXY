@@ -4,9 +4,6 @@ void main() {
   runApp(const GoalaxyApp());
 }
 
-const green = Colors.greenAccent;
-const dark = Color(0xFF080D0B);
-
 class GoalaxyApp extends StatelessWidget {
   const GoalaxyApp({super.key});
 
@@ -15,34 +12,35 @@ class GoalaxyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'GOALAXY',
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: dark,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green,
-          brightness: Brightness.dark,
-        ),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.white,
       ),
-      home: const MainPage(),
+      home: const HomePage(),
     );
   }
 }
 
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MainPageState extends State<MainPage> {
-  int page = 0;
+class _HomePageState extends State<HomePage> {
+  final List<bool> liked = [false, false, false];
 
-  final pages = const [
-    VideoPage(),
-    ExplorePage(),
-    UploadPage(),
-    MessagesPage(),
-    ProfilePage(),
+  final List<String> users = [
+    'GOALAXY User',
+    'Football Fan',
+    'World Football',
+  ];
+
+  final List<String> videos = [
+    'Football video',
+    'Amazing football moments',
+    'Welcome to GOALAXY',
   ];
 
   @override
@@ -51,129 +49,115 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: const Text(
-          'GOALAXY ⚽',
+          'GOALAXY',
           style: TextStyle(
-            color: green,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const NotificationsPage(),
-                ),
-              );
-            },
-          ),
-        ],
       ),
-      body: pages[page],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: page,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.black,
-        selectedItemColor: green,
-        unselectedItemColor: Colors.white54,
-        onTap: (value) {
-          setState(() {
-            page = value;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+      body: ListView(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              'Watch and share videos',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Explore',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_box),
-            label: 'Upload',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Messages',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+          for (int i = 0; i < users.length; i++)
+            Card(
+              margin: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListTile(
+                    leading: const CircleAvatar(
+                      child: Icon(Icons.person),
+                    ),
+                    title: Text(users[i]),
+                    subtitle: Text(videos[i]),
+                    trailing: const Icon(Icons.more_vert),
+                  ),
+                  Container(
+                    height: 180,
+                    width: double.infinity,
+                    color: Colors.black12,
+                    child: const Icon(
+                      Icons.play_circle_fill,
+                      size: 65,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          liked[i]
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: liked[i] ? Colors.red : Colors.black,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            liked[i] = !liked[i];
+                          });
+                        },
+                      ),
+                      const Text('Like'),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.comment),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CommentsPage(
+                                videoTitle: videos[i],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const Text('Comment'),
+                      const SizedBox(width: 12),
+                    ],
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
   }
 }
 
-class VideoPage extends StatefulWidget {
-  const VideoPage({super.key});
+class CommentsPage extends StatelessWidget {
+  final String videoTitle;
 
-  @override
-  State<VideoPage> createState() => _VideoPageState();
-}
-
-class _VideoPageState extends State<VideoPage> {
-  bool liked = false;
+  const CommentsPage({
+    super.key,
+    required this.videoTitle,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        Container(
-          height: 420,
-          color: const Color(0xFF14231B),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(Icons.sports_soccer, size: 100, color: green),
-              SizedBox(height: 20),
-              Text(
-                'GOALAXY FOOTBALL',
-                style: TextStyle(fontSize: 25),
-              ),
-              Text('Watch and share videos'),
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Comments'),
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+      ),
+      body: Center(
+        child: Text(
+          'Comments for $videoTitle',
+          style: const TextStyle(fontSize: 18),
         ),
-        ListTile(
-          leading: const CircleAvatar(
-            child: Icon(Icons.person),
-          ),
-          title: const Text('GOALAXY User'),
-          subtitle: const Text('Football video'),
-          trailing: const Icon(Icons.more_vert),
-        ),
-        Row(
-          children: [
-            IconButton(
-              icon: Icon(
-                liked ? Icons.favorite : Icons.favorite_border,
-                color: liked ? Colors.red : Colors.white,
-              ),
-              onPressed: () {
-                setState(() {
-                  liked = !liked;
-                });
-              },
-            ),
-            const Text('Like'),
-            IconButton(
-              icon: const Icon(Icons.comment),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const CommentsPage(),
-                  ),
-                );
-              },
-            ),
-            const Text('Comments'),
-            const Spacer(),
-            Icon
+      ),
+    );
+  }
+}
