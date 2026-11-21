@@ -4,6 +4,9 @@ void main() {
   runApp(const GoalaxyApp());
 }
 
+const green = Colors.greenAccent;
+const dark = Color(0xFF080D0B);
+
 class GoalaxyApp extends StatelessWidget {
   const GoalaxyApp({super.key});
 
@@ -13,59 +16,72 @@ class GoalaxyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'GOALAXY',
       theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF080D0B),
-        primaryColor: const Color(0xFF00C853),
+        scaffoldBackgroundColor: dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.green,
+          brightness: Brightness.dark,
+        ),
       ),
-      home: const HomePage(),
+      home: const MainPage(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  int selected = 0;
-  bool liked = false;
+class _MainPageState extends State<MainPage> {
+  int page = 0;
 
-  final List<String> titles = [
-    'Home',
-    'Explore',
-    'Upload',
-    'Messages',
-    'Profile',
+  final pages = const [
+    VideoPage(),
+    ExplorePage(),
+    UploadPage(),
+    MessagesPage(),
+    ProfilePage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF080D0B),
+        backgroundColor: Colors.black,
         title: const Text(
           'GOALAXY ⚽',
           style: TextStyle(
-            color: Colors.greenAccent,
+            color: green,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const NotificationsPage(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
-      body: selected == 0
-          ? homeScreen()
-          : otherScreen(),
+      body: pages[page],
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF101915),
-        selectedItemColor: Colors.greenAccent,
-        unselectedItemColor: Colors.white54,
-        currentIndex: selected,
+        currentIndex: page,
         type: BottomNavigationBarType.fixed,
-        onTap: (index) {
+        backgroundColor: Colors.black,
+        selectedItemColor: green,
+        unselectedItemColor: Colors.white54,
+        onTap: (value) {
           setState(() {
-            selected = index;
+            page = value;
           });
         },
         items: const [
@@ -74,11 +90,11 @@ class _HomePageState extends State<HomePage> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
+            icon: Icon(Icons.search),
             label: 'Explore',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle),
+            icon: Icon(Icons.add_box),
             label: 'Upload',
           ),
           BottomNavigationBarItem(
@@ -93,113 +109,71 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
 
-  Widget homeScreen() {
-    return Column(
+class VideoPage extends StatefulWidget {
+  const VideoPage({super.key});
+
+  @override
+  State<VideoPage> createState() => _VideoPageState();
+}
+
+class _VideoPageState extends State<VideoPage> {
+  bool liked = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
       children: [
-        const SizedBox(height: 12),
-        const Text(
-          'Discover the World of Football',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 19,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 15),
-        Expanded(
-          child: Container(
-            margin: const EdgeInsets.all(12),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              gradient: const LinearGradient(
-                colors: [
-                  Color(0xFF123D29),
-                  Color(0xFF080D0B),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+        Container(
+          height: 420,
+          color: const Color(0xFF14231B),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.sports_soccer, size: 100, color: green),
+              SizedBox(height: 20),
+              Text(
+                'GOALAXY FOOTBALL',
+                style: TextStyle(fontSize: 25),
               ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.sports_soccer,
-                  size: 100,
-                  color: Colors.greenAccent,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'GOALAXY',
-                  style: TextStyle(
-                    color: Colors.greenAccent,
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Text(
-                  'Your World. Your Videos.',
-                  style: TextStyle(color: Colors.white70),
-                ),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          liked = !liked;
-                        });
-                      },
-                      icon: Icon(
-                        liked
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: liked ? Colors.red : Colors.white,
-                        size: 32,
-                      ),
-                    ),
-                    const Icon(
-                      Icons.comment,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                    const Icon(
-                      Icons.share,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 15),
-              ],
-            ),
+              Text('Watch and share videos'),
+            ],
           ),
         ),
-      ],
-    );
-  }
-
-  Widget otherScreen() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            selected == 1
-                ? Icons.explore
-                : selected == 2
-                    ? Icons.add_circle
-                    : selected == 3
-                        ? Icons.chat
-                        : Icons.person,
-            color: Colors.greenAccent,
-            size: 75,
+        ListTile(
+          leading: const CircleAvatar(
+            child: Icon(Icons.person),
           ),
-          const SizedBox(height: 20),
-          Text(
-            titles[selected],
-            style: const TextStyle(
-              color: Colors.greenAccent
+          title: const Text('GOALAXY User'),
+          subtitle: const Text('Football video'),
+          trailing: const Icon(Icons.more_vert),
+        ),
+        Row(
+          children: [
+            IconButton(
+              icon: Icon(
+                liked ? Icons.favorite : Icons.favorite_border,
+                color: liked ? Colors.red : Colors.white,
+              ),
+              onPressed: () {
+                setState(() {
+                  liked = !liked;
+                });
+              },
+            ),
+            const Text('Like'),
+            IconButton(
+              icon: const Icon(Icons.comment),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CommentsPage(),
+                  ),
+                );
+              },
+            ),
+            const Text('Comments'),
+            const Spacer(),
+            Icon
