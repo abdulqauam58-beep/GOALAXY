@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -20,6 +21,7 @@ jobs:
           cp lib/main.dart /tmp/main.dart
           flutter create . --project-name goalaxy --org com.goalaxy.newapp
           cp /tmp/main.dart lib/main.dart
+          cp google-services.json android/app/google-services.json
 
       - name: Build APK
         run: flutter build apk --release
@@ -27,5 +29,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: GOALAXY-APK-NEW
+          name: GOALAXY-APK
           path: build/app/outputs/flutter-apk/app-release.apk
