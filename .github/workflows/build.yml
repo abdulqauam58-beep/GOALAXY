@@ -1,4 +1,4 @@
-hame: Build GOALAXY APK
+name: Build GOALAXY APK
 
 on:
   push:
