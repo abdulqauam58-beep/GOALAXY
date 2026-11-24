@@ -2,7 +2,7 @@ name: Build GOALAXY APK
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
@@ -10,15 +10,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+
       - name: Create Android Project
-        run: flutter create . --project-name goalaxy --org com.goalaxy.app
+        run: |
+          cp lib/main.dart /tmp/main.dart
+          flutter create . --project-name goalaxy --org com.goalaxy.newapp
+          cp /tmp/main.dart lib/main.dart
+
       - name: Build APK
         run: flutter build apk --release
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: GOALAXY-APK
+          name: GOALAXY-APK-NEW
           path: build/app/outputs/flutter-apk/app-release.apk
