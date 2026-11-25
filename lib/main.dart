@@ -6,43 +6,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: 'AIzaSyBkuq_l0r6nBHH-azLdBOadYYfbdBsc-3Y',
-        appId: '1:257666001605:android:693d089af2fc4ec5c75eac',
-        messagingSenderId: '257666001605',
-        projectId: 'goalaxy-481e0',
-        storageBucket: 'goalaxy-481e0.firebasestorage.app',
-      ),
-    );
-    runApp(const GOALAXY());
-  } catch (e) {
-    runApp(ErrorApp(error: e.toString()));
-  }
-}
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+      apiKey: 'AIzaSyBkuq_l0r6nBHH-azLdBOadYYfbdBsc-3Y',
+      appId: '1:257666001605:android:693d089af2fc4ec5c75eac',
+      messagingSenderId: '257666001605',
+      projectId: 'goalaxy-481e0',
+      storageBucket: 'goalaxy-481e0.firebasestorage.app',
+    ),
+  );
 
-class ErrorApp extends StatelessWidget {
-  final String error;
-  const ErrorApp({super.key, required this.error});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Text(
-              'GOALAXY Startup Error:\n$error',
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  runApp(const GOALAXY());
 }
 
 class GOALAXY extends StatelessWidget {
@@ -54,37 +28,27 @@ class GOALAXY extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'GOALAXY',
       theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF101010),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.orange,
-          brightness: Brightness.dark,
-        ),
+        scaffoldBackgroundColor: const Color(0xFF101018),
+        primaryColor: Colors.green,
       ),
-      home: const LoginPage(),
+      home: const AuthPage(),
     );
   }
 }
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class AuthPage extends StatefulWidget {
+  const AuthPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<AuthPage> createState() => _AuthPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _AuthPageState extends State<AuthPage> {
   final email = TextEditingController();
   final password = TextEditingController();
   bool loading = false;
 
   Future<void> login(bool create) async {
-    if (email.text.trim().isEmpty || password.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter email and password')),
-      );
-      return;
-    }
-
     setState(() => loading = true);
 
     try {
@@ -107,11 +71,9 @@ class _LoginPageState extends State<LoginPage> {
         MaterialPageRoute(builder: (_) => const MainPage()),
       );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
 
     if (mounted) setState(() => loading = false);
@@ -121,25 +83,21 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: SingleChildScrollView(
+        child: Padding(
           padding: const EdgeInsets.all(25),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.sports_soccer,
-                color: Colors.orange,
-                size: 85,
-              ),
-              const SizedBox(height: 15),
               const Text(
                 'GOALAXY',
                 style: TextStyle(
-                  fontSize: 35,
-                  color: Colors.orange,
+                  fontSize: 40,
                   fontWeight: FontWeight.bold,
+                  color: Colors.green,
                 ),
               ),
-              const SizedBox(height: 30),
+              const Text('WORLD FOOTBALL COMMUNITY'),
+              const SizedBox(height: 35),
               TextField(
                 controller: email,
                 decoration: const InputDecoration(
@@ -156,7 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 25),
               if (loading)
                 const CircularProgressIndicator()
               else ...[
@@ -164,12 +122,15 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => login(false),
-                    child: const Text('Login'),
+                    child: const Text('LOGIN'),
                   ),
                 ),
-                TextButton(
-                  onPressed: () => login(true),
-                  child: const Text('Create Account'),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => login(true),
+                    child: const Text('CREATE ACCOUNT'),
+                  ),
                 ),
               ],
             ],
@@ -188,10 +149,10 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int page = 0;
+  int selected = 0;
 
   final pages = const [
-    FeedPage(),
+    HomePage(),
     SearchPage(),
     UploadPage(),
     AlertsPage(),
@@ -205,20 +166,20 @@ class _MainPageState extends State<MainPage> {
         title: const Text(
           'GOALAXY ⚽',
           style: TextStyle(
-            color: Colors.orange,
+            color: Colors.green,
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true,
+        backgroundColor: const Color(0xFF101018),
       ),
-      body: pages[page],
+      body: pages[selected],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: page,
+        currentIndex: selected,
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.black,
-        selectedItemColor: Colors.orange,
+        backgroundColor: const Color(0xFF191923),
+        selectedItemColor: Colors.green,
         unselectedItemColor: Colors.grey,
-        onTap: (value) => setState(() => page = value),
+        onTap: (i) => setState(() => selected = i),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -229,7 +190,7 @@ class _MainPageState extends State<MainPage> {
             label: 'Search',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle),
+            icon: Icon(Icons.add_box),
             label: 'Upload',
           ),
           BottomNavigationBarItem(
@@ -246,8 +207,8 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
-class FeedPage extends StatelessWidget {
-  const FeedPage({super.key});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -258,20 +219,16 @@ class FeedPage extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Center(
-            child: Text('Could not load posts'),
-          );
+          return const Center(child: Text('Something went wrong'));
         }
 
         if (!snapshot.hasData) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (snapshot.data!.docs.isEmpty) {
           return const Center(
-            child: Text('Welcome to GOALAXY ⚽\nNo posts yet.'),
+            child: Text('Welcome to GOALAXY ⚽\nNo posts yet!'),
           );
         }
 
@@ -280,113 +237,52 @@ class FeedPage extends StatelessWidget {
             final data = doc.data() as Map<String, dynamic>;
 
             return Card(
-              margin: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ListTile(
-                    leading: const CircleAvatar(
-                      child: Icon(Icons.person),
+              color: const Color(0xFF20202B),
+              margin: const EdgeInsets.all(10),
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data['email'] ?? 'Football Fan',
+                      style: const TextStyle(color: Colors.green),
                     ),
-                    title: Text(data['email'] ?? 'GOALAXY user'),
-                    subtitle: const Text('Football ⚽'),
-                  ),
-                  if (data['text'] != null)
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(data['text']),
+                    const SizedBox(height: 12),
+                    Text(
+                      data['text'] ?? '',
+                      style: const TextStyle(fontSize: 18),
                     ),
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => likePost(doc.id),
-                        icon: const Icon(
-                          Icons.favorite_border,
-                          color: Colors.red,
+                    const SizedBox(height: 15),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.favorite_border),
+                          onPressed: () async {
+                            final uid = FirebaseAuth.instance.currentUser!.uid;
+                            await doc.reference
+                                .collection('likes')
+                                .doc(uid)
+                                .set({'likedAt': FieldValue.serverTimestamp()});
+                          },
                         ),
-                      ),
-                      Text('${data['likes'] ?? 0}'),
-                      IconButton(
-                        onPressed: () => showComments(context, doc.id),
-                        icon: const Icon(Icons.comment),
-                      ),
-                      const Text('Comment'),
-                    ],
-                  ),
-                ],
+                        StreamBuilder<QuerySnapshot>(
+                          stream: doc.reference
+                              .collection('likes')
+                              .snapshots(),
+                          builder: (context, likes) {
+                            return Text('${likes.data?.docs.length ?? 0}');
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             );
           }).toList(),
         );
       },
-    );
-  }
-}
-
-Future<void> likePost(String id) async {
-  await FirebaseFirestore.instance
-      .collection('posts')
-      .doc(id)
-      .update({
-    'likes': FieldValue.increment(1),
-  });
-}
-
-void showComments(BuildContext context, String postId) {
-  final controller = TextEditingController();
-
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    builder: (context) => Padding(
-      padding: EdgeInsets.only(
-        left: 15,
-        right: 15,
-        top: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-      ),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          hintText: 'Write a comment...',
-          suffixIcon: IconButton(
-            icon: const Icon(Icons.send),
-            onPressed: () async {
-              if (controller.text.trim().isEmpty) return;
-
-              await FirebaseFirestore.instance
-                  .collection('posts')
-                  .doc(postId)
-                  .collection('comments')
-                  .add({
-                'text': controller.text.trim(),
-                'email': FirebaseAuth.instance.currentUser?.email,
-                'createdAt': FieldValue.serverTimestamp(),
-              });
-
-              if (context.mounted) Navigator.pop(context);
-            },
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
-class SearchPage extends StatelessWidget {
-  const SearchPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(16),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'Search GOALAXY...',
-          prefixIcon: Icon(Icons.search),
-          border: OutlineInputBorder(),
-        ),
-      ),
     );
   }
 }
@@ -402,115 +298,27 @@ class _UploadPageState extends State<UploadPage> {
   final controller = TextEditingController();
   bool uploading = false;
 
-  Future<void> uploadPost() async {
+  Future<void> publish() async {
     if (controller.text.trim().isEmpty) return;
 
     setState(() => uploading = true);
 
     try {
+      final user = FirebaseAuth.instance.currentUser!;
+
       await FirebaseFirestore.instance.collection('posts').add({
         'text': controller.text.trim(),
-        'email': FirebaseAuth.instance.currentUser?.email,
-        'likes': 0,
+        'email': user.email,
+        'uid': user.uid,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
       controller.clear();
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Post published!')),
-        );
-      }
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Post published successfully!')),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    }
-
-    if (mounted) setState(() => uploading = false);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          const Text(
-            'Create a GOALAXY post',
-            style: TextStyle(fontSize: 22),
-          ),
-          const SizedBox(height: 20),
-          TextField(
-            controller: controller,
-            maxLines: 5,
-            decoration: const InputDecoration(
-              hintText: 'Write something about football...',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton.icon(
-            onPressed: uploading ? null : uploadPost,
-            icon: const Icon(Icons.publish),
-            label: Text(uploading ? 'Publishing...' : 'Publish'),
-          ),
-          const SizedBox(height: 15),
-          const Text('Text posts are available. Video upload is not added yet.'),
-        ],
-      ),
-    );
-  }
-}
-
-class AlertsPage extends StatelessWidget {
-  const AlertsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('GOALAXY Notifications'),
-    );
-  }
-}
-
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircleAvatar(
-            radius: 45,
-            child: Icon(Icons.person, size: 50),
-          ),
-          const SizedBox(height: 15),
-          Text(user?.email ?? 'GOALAXY User'),
-          ElevatedButton(
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-
-              if (context.mounted) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const LoginPage(),
-                  ),
-                );
-              }
-            },
-            child: const Text('Logout'),
-          ),
-        ],
-      ),
-    );
-  }
-}
+      ScaffoldMessenger.of(context).
