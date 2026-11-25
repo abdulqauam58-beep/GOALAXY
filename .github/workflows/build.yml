@@ -19,7 +19,7 @@ jobs:
       - name: Create Android Project
         run: |
           cp lib/main.dart /tmp/main.dart
-          flutter create . --project-name goalaxy --org com.goalaxy.flutter create . --project-name goalaxy --org com.goalaxy
+          flutter create . --project-name goalaxy --org com.goalaxy
           cp /tmp/main.dart lib/main.dart
           cp google-services.json android/app/google-services.json
 
