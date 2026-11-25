@@ -1,4 +1,4 @@
-name: Build GOALAXY APK
+name: Build GOALAXY Android
 
 on:
   push:
@@ -26,8 +26,13 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
-      - name: Upload APK
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+
+      - name: Upload APK and AAB
         uses: actions/upload-artifact@v4
         with:
-          name: GOALAXY-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: GOALAXY-RELEASE
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
