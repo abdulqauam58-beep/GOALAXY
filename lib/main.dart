@@ -5,8 +5,44 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(const GOALAXY());
+
+  try {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: 'AIzaSyBkuq_l0r6nBHH-azLdBOadYYfbdBsc-3Y',
+        appId: '1:257666001605:android:693d089af2fc4ec5c75eac',
+        messagingSenderId: '257666001605',
+        projectId: 'goalaxy-481e0',
+        storageBucket: 'goalaxy-481e0.firebasestorage.app',
+      ),
+    );
+    runApp(const GOALAXY());
+  } catch (e) {
+    runApp(ErrorApp(error: e.toString()));
+  }
+}
+
+class ErrorApp extends StatelessWidget {
+  final String error;
+  const ErrorApp({super.key, required this.error});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Text(
+              'GOALAXY Startup Error:\n$error',
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class GOALAXY extends StatelessWidget {
@@ -42,7 +78,15 @@ class _LoginPageState extends State<LoginPage> {
   bool loading = false;
 
   Future<void> login(bool create) async {
+    if (email.text.trim().isEmpty || password.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter email and password')),
+      );
+      return;
+    }
+
     setState(() => loading = true);
+
     try {
       if (create) {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -55,16 +99,21 @@ class _LoginPageState extends State<LoginPage> {
           password: password.text.trim(),
         );
       }
+
       if (!mounted) return;
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const MainPage()),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     }
+
     if (mounted) setState(() => loading = false);
   }
 
@@ -76,14 +125,20 @@ class _LoginPageState extends State<LoginPage> {
           padding: const EdgeInsets.all(25),
           child: Column(
             children: [
-              const Icon(Icons.sports_soccer,
-                  color: Colors.orange, size: 85),
+              const Icon(
+                Icons.sports_soccer,
+                color: Colors.orange,
+                size: 85,
+              ),
               const SizedBox(height: 15),
-              const Text('GOALAXY',
-                  style: TextStyle(
-                      fontSize: 35,
-                      color: Colors.orange,
-                      fontWeight: FontWeight.bold)),
+              const Text(
+                'GOALAXY',
+                style: TextStyle(
+                  fontSize: 35,
+                  color: Colors.orange,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 30),
               TextField(
                 controller: email,
@@ -147,10 +202,13 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('GOALAXY ⚽',
-            style: TextStyle(
-                color: Colors.orange,
-                fontWeight: FontWeight.bold)),
+        title: const Text(
+          'GOALAXY ⚽',
+          style: TextStyle(
+            color: Colors.orange,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
       ),
       body: pages[page],
@@ -163,15 +221,25 @@ class _MainPageState extends State<MainPage> {
         onTap: (value) => setState(() => page = value),
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.home), label: 'Home'),
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.search), label: 'Search'),
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle), label: 'Upload'),
+            icon: Icon(Icons.add_circle),
+            label: 'Upload',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.notifications), label: 'Alerts'),
+            icon: Icon(Icons.notifications),
+            label: 'Alerts',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.person), label: 'Profile'),
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
         ],
       ),
     );
@@ -190,11 +258,17 @@ class FeedPage extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Center(child: Text('Could not load posts'));
+          return const Center(
+            child: Text('Could not load posts'),
+          );
         }
+
         if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         }
+
         if (snapshot.data!.docs.isEmpty) {
           return const Center(
             child: Text('Welcome to GOALAXY ⚽\nNo posts yet.'),
@@ -204,6 +278,7 @@ class FeedPage extends StatelessWidget {
         return ListView(
           children: snapshot.data!.docs.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
+
             return Card(
               margin: const EdgeInsets.all(12),
               child: Column(
@@ -211,9 +286,10 @@ class FeedPage extends StatelessWidget {
                 children: [
                   ListTile(
                     leading: const CircleAvatar(
-                        child: Icon(Icons.person)),
+                      child: Icon(Icons.person),
+                    ),
                     title: Text(data['email'] ?? 'GOALAXY user'),
-                    subtitle: const Text('Football video ⚽'),
+                    subtitle: const Text('Football ⚽'),
                   ),
                   if (data['text'] != null)
                     Padding(
@@ -224,11 +300,12 @@ class FeedPage extends StatelessWidget {
                     children: [
                       IconButton(
                         onPressed: () => likePost(doc.id),
-                        icon: const Icon(Icons.favorite_border,
-                            color: Colors.red),
+                        icon: const Icon(
+                          Icons.favorite_border,
+                          color: Colors.red,
+                        ),
                       ),
                       Text('${data['likes'] ?? 0}'),
-                      const SizedBox(width: 25),
                       IconButton(
                         onPressed: () => showComments(context, doc.id),
                         icon: const Icon(Icons.comment),
@@ -247,7 +324,10 @@ class FeedPage extends StatelessWidget {
 }
 
 Future<void> likePost(String id) async {
-  await FirebaseFirestore.instance.collection('posts').doc(id).update({
+  await FirebaseFirestore.instance
+      .collection('posts')
+      .doc(id)
+      .update({
     'likes': FieldValue.increment(1),
   });
 }
@@ -273,6 +353,7 @@ void showComments(BuildContext context, String postId) {
             icon: const Icon(Icons.send),
             onPressed: () async {
               if (controller.text.trim().isEmpty) return;
+
               await FirebaseFirestore.instance
                   .collection('posts')
                   .doc(postId)
@@ -282,6 +363,7 @@ void showComments(BuildContext context, String postId) {
                 'email': FirebaseAuth.instance.currentUser?.email,
                 'createdAt': FieldValue.serverTimestamp(),
               });
+
               if (context.mounted) Navigator.pop(context);
             },
           ),
@@ -296,18 +378,14 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = TextEditingController();
-
-    return Padding(
-      padding: const EdgeInsets.all(16),
+    return const Padding(
+      padding: EdgeInsets.all(16),
       child: TextField(
-        controller: controller,
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           hintText: 'Search GOALAXY...',
           prefixIcon: Icon(Icons.search),
           border: OutlineInputBorder(),
         ),
-        onSubmitted: (value) {},
       ),
     );
   }
@@ -361,8 +439,10 @@ class _UploadPageState extends State<UploadPage> {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          const Text('Create a GOALAXY post',
-              style: TextStyle(fontSize: 22)),
+          const Text(
+            'Create a GOALAXY post',
+            style: TextStyle(fontSize: 22),
+          ),
           const SizedBox(height: 20),
           TextField(
             controller: controller,
@@ -375,12 +455,11 @@ class _UploadPageState extends State<UploadPage> {
           const SizedBox(height: 20),
           ElevatedButton.icon(
             onPressed: uploading ? null : uploadPost,
-            icon
-: const Icon(Icons.publish),
+            icon: const Icon(Icons.publish),
             label: Text(uploading ? 'Publishing...' : 'Publish'),
           ),
           const SizedBox(height: 15),
-          const Text('Video upload will be added later.'),
+          const Text('Text posts are available. Video upload is not added yet.'),
         ],
       ),
     );
@@ -392,7 +471,9 @@ class AlertsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('GOALAXY Notifications'));
+    return const Center(
+      child: Text('GOALAXY Notifications'),
+    );
   }
 }
 
@@ -402,6 +483,7 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -415,6 +497,7 @@ class ProfilePage extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
+
               if (context.mounted) {
                 Navigator.pushReplacement(
                   context,
