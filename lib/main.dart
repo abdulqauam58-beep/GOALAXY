@@ -376,3 +376,58 @@ class _UploadPageState extends State<UploadPage> {
           ElevatedButton.icon(
             onPressed: uploading ? null : uploadPost,
             icon
+: const Icon(Icons.publish),
+            label: Text(uploading ? 'Publishing...' : 'Publish'),
+          ),
+          const SizedBox(height: 15),
+          const Text('Video upload will be added later.'),
+        ],
+      ),
+    );
+  }
+}
+
+class AlertsPage extends StatelessWidget {
+  const AlertsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text('GOALAXY Notifications'));
+  }
+}
+
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircleAvatar(
+            radius: 45,
+            child: Icon(Icons.person, size: 50),
+          ),
+          const SizedBox(height: 15),
+          Text(user?.email ?? 'GOALAXY User'),
+          ElevatedButton(
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              if (context.mounted) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LoginPage(),
+                  ),
+                );
+              }
+            },
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+  }
+}
